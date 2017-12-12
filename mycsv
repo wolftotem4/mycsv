@@ -1,0 +1,56 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+/**
+ * @param  string  $string
+ * @return string
+ */
+function escape($string)
+{
+    return is_escaping_required($string) ? '"' . str_replace('"', '""', $string) . '"' : $string;
+}
+
+/**
+ * @param  string  $string
+ * @return bool
+ */
+function is_escaping_required($string)
+{
+    $quotationMark = (substr($string, 0, 1) == '"') || (substr($string, -1) == '"');
+    $comma = (strpos($string, ',') !== false);
+    return $quotationMark && $comma;
+}
+
+/**
+ * @return bool
+ */
+function is_win()
+{
+    return (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
+}
+
+// Using UTF-8 if the program is running on Windows.
+(is_win()) and exec('chcp 65001', $msg);
+
+$file = isset($argv[1]) ? $argv[1] : null;
+if (! $file) {
+    file_put_contents('php://stderr', 'The basic command usage: php mycsv [file.txt]');
+    exit;
+}elseif (! file_exists($file)) {
+    file_put_contents('php://stderr', "'$file' doesn't exist.");
+    exit;
+}
+
+$fd = fopen($file, 'r');
+$parser = new \MyCsv\ParseWalker();
+
+while (($buffer = fgets($fd, 4096)) !== false) {
+    $row = $parser->parseLine($buffer);
+    if (is_array($row)) {
+        echo implode(',', array_map('escape', $row)), PHP_EOL;
+    }
+}
+
+fclose($fd);
