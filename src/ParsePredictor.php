@@ -41,26 +41,37 @@ class ParsePredictor
      * @param  string  $encoding
      * @return array
      */
-    public static function separate($string, $lengthData = [], $encoding = 'UTF-8')
+    public static function separate($string, array $lengthData = [], $encoding = 'UTF-8')
     {
         (preg_match('/^\| (.*) \|$/', $string, $match)) and ($string = $match[1]);
 
         $row = explode(self::COLUMN_SEPARATOR, $string);
 
         $returnArray = [];
-        foreach ($lengthData as $length) {
-            $column             = array_shift($row);
-            $actual_length      = mb_strwidth($column, $encoding);
-            while ($actual_length < $length) {
-                $column        .= self::COLUMN_SEPARATOR . array_shift($row);
-                $actual_length += mb_strwidth($column, $encoding);
-            }
+        if ($lengthData && substr_count($string, self::COLUMN_SEPARATOR) > count($lengthData) - 1) {
+            foreach ($lengthData as $length) {
+                $column = array_shift($row);
+                $actual_length = mb_strwidth($column, $encoding);
+                while ($actual_length < $length) {
+                    $column .= self::COLUMN_SEPARATOR . array_shift($row);
+                    $actual_length = mb_strwidth($column, $encoding);
+                }
 
-            $returnArray[] = trim($column);
+                $returnArray[] = $column;
+            }
         }
 
-        $returnArray = array_merge($returnArray, $row);
+        $returnArray = array_map('static::cleanSpace', array_merge($returnArray, $row));
 
         return $returnArray;
+    }
+
+    /**
+     * @param  string  $string
+     * @return string
+     */
+    protected static function cleanSpace($string)
+    {
+        return rtrim($string, ' ');
     }
 }

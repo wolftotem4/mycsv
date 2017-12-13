@@ -26,12 +26,15 @@ class ParsePredictorTest extends TestCase
 
     public function testSeparate()
     {
-        $string = '| 中文 | dc | xyxyabc | ha |';
+        $string = '| 中文 | dc | xyxyabc  | ha  |';
 
         $returnValue = ParsePredictor::separate($string);
         $this->assertEquals(['中文', 'dc', 'xyxyabc', 'ha'], $returnValue);
 
-        $returnValue = ParsePredictor::separate($string, [9, 12]);
-        $this->assertEquals(['中文 | dc', 'xyxyabc | ha'], $returnValue);
+        $returnValue = ParsePredictor::separate($string, [4, 2, 8, 3]);
+        $this->assertEquals(['中文', 'dc', 'xyxyabc', 'ha'], $returnValue);
+
+        $returnValue = ParsePredictor::separate($string, [9, 14]);
+        $this->assertEquals(['中文 | dc', 'xyxyabc  | ha'], $returnValue);
     }
 }
