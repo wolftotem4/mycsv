@@ -5,6 +5,16 @@ namespace MyCsv;
 class ParseWalker
 {
     /**
+     * @var string
+     */
+    protected $newline = PHP_EOL;
+
+    /**
+     * @var string
+     */
+    protected $separator = ',';
+
+    /**
      * @var bool
      */
     protected $lengthParsed = false;
@@ -15,17 +25,39 @@ class ParseWalker
     protected $columns = [];
 
     /**
-     * @param $string
+     * @param  string  $newline
+     * @return $this
      */
-    public function parse($string)
+    public function setNewLine($newline)
     {
-        $lines = preg_split("\r\n|\r|\n", $string);
-        array_walk($lines, array($this, 'parseLine'));
+        $this->newline = $newline;
+        return $this;
+    }
+
+    /**
+     * @param  string  $separator
+     * @return $this
+     */
+    public function setSeparator($separator)
+    {
+        $this->separator = $separator;
+        return $this;
     }
 
     /**
      * @param  string  $string
-     * @return array|null
+     * @return string
+     */
+    public function parse($string)
+    {
+        $lines = preg_split('/(?>\r\n|[\r\n])/', $string);
+        $data = array_map([$this, 'parseLine'], $lines);
+        return implode($data);
+    }
+
+    /**
+     * @param  string  $string
+     * @return string
      */
     public function parseLine($string)
     {
@@ -33,11 +65,11 @@ class ParseWalker
 
         if (ParsePredictor::isEdge($string)) {
             $this->parseColumnsLength($string);
-            return null;
+            return '';
         } elseif (ParsePredictor::isDataRow($string)) {
-            return ParsePredictor::separate($string, $this->columns);
+            return implode($this->separator, ParsePredictor::separate($string, $this->columns)) . $this->newline;
         } else {
-            return null;
+            return '';
         }
     }
 

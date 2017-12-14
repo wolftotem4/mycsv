@@ -72,6 +72,6 @@ class ParsePredictor
      */
     protected static function cleanSpace($string)
     {
-        return rtrim($string, ' ');
+        return trim($string, ' ');
     }
 }

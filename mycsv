@@ -47,10 +47,7 @@ $fd = fopen($file, 'r');
 $parser = new \MyCsv\ParseWalker();
 
 while (($buffer = fgets($fd, 4096)) !== false) {
-    $row = $parser->parseLine($buffer);
-    if (is_array($row)) {
-        echo implode(',', array_map('escape', $row)), PHP_EOL;
-    }
+    echo $parser->parseLine($buffer);
 }
 
 fclose($fd);
