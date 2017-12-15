@@ -67,7 +67,8 @@ class ParseWalker
             $this->parseColumnsLength($string);
             return '';
         } elseif (ParsePredictor::isDataRow($string)) {
-            return implode($this->separator, ParsePredictor::separate($string, $this->columns)) . $this->newline;
+            $fields = array_map([$this, 'csvField'], ParsePredictor::separate($string, $this->columns));
+            return implode($this->separator, $fields) . $this->newline;
         } else {
             return '';
         }
@@ -80,5 +81,14 @@ class ParseWalker
     {
         $this->lengthParsed = true;
         $this->columns = ParsePredictor::columnsLength($string);
+    }
+
+    /**
+     * @param $string
+     * @return string
+     */
+    protected function csvField($string)
+    {
+        return CsvParser::escape($string, $this->separator . "\r\n");
     }
 }

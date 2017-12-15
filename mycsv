@@ -4,26 +4,6 @@
 require_once __DIR__ . '/vendor/autoload.php';
 
 /**
- * @param  string  $string
- * @return string
- */
-function escape($string)
-{
-    return is_escaping_required($string) ? '"' . str_replace('"', '""', $string) . '"' : $string;
-}
-
-/**
- * @param  string  $string
- * @return bool
- */
-function is_escaping_required($string)
-{
-    $quotationMark = (substr($string, 0, 1) == '"') || (substr($string, -1) == '"');
-    $comma = (strpos($string, ',') !== false);
-    return $quotationMark && $comma;
-}
-
-/**
  * @return bool
  */
 function is_win()
