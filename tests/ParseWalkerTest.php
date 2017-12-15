@@ -1,8 +1,8 @@
 <?php
 
-namespace MyCsv;
+namespace Tests\MyCsv;
 
-
+use MyCsv\ParseWalker;
 use PHPUnit\Framework\TestCase;
 
 class ParseWalkerTest extends TestCase
